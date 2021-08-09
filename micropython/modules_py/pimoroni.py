@@ -149,5 +149,3 @@ class Motor:
             else:
                 self.pos_pwm.duty_u16(0)
                 self.neg_pwm.duty_u16(0 - signed_duty_cycle)
-    }
-
