@@ -3,7 +3,7 @@
 namespace pimoroni {
   PicoGraphics::PicoGraphics(uint16_t width, uint16_t height, uint16_t *frame_buffer)
   : frame_buffer(frame_buffer), bounds(0, 0, width, height), clip(0, 0, width, height) {
-    set_font(&font6);
+    set_font(&font8);
   };
 
   void PicoGraphics::set_font(const Font *font){
@@ -39,7 +39,13 @@ namespace pimoroni {
   }
 
   void PicoGraphics::clear() {
-    rectangle(clip);
+    //rectangle(clip);
+    uint32_t dpix = (pen<<16)|pen;
+    uint32_t *dest = (uint32_t *)ptr(0,0);
+    int32_t l = (bounds.w * bounds.h) >> 1;
+	while(l--) {
+	    *dest++ = dpix;
+	}
   }
 
   void PicoGraphics::pixel(const Point &p) {

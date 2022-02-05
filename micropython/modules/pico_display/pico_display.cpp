@@ -338,4 +338,124 @@ mp_obj_t picodisplay_text(mp_uint_t n_args, const mp_obj_t *args) {
 
     return mp_const_none;
 }
+// Scottie Functions :)
+mp_obj_t picodisplay_line(mp_uint_t n_args, const mp_obj_t *args) {
+    (void)n_args; //Unused input parameter, we know it's 4
+    
+    if(display != nullptr) {
+        int x1 = mp_obj_get_int(args[0]);
+        int y1 = mp_obj_get_int(args[1]);
+        int x2 = mp_obj_get_int(args[2]);
+        int y2 = mp_obj_get_int(args[3]);
+
+        Point p1(x1, y1);
+        Point p2(x2, y2);
+        display->line(p1, p2);
+    }
+    else
+        mp_raise_msg(&mp_type_RuntimeError, NOT_INITIALISED_MSG);
+
+    return mp_const_none;
+}
+mp_obj_t picodisplay_draw(size_t n_args, const mp_obj_t *args)
+{
+	//st7789_ST7789_obj_t *self			 = MP_OBJ_TO_PTR(args[0]);
+	char				 single_char_s[] = {0, 0};
+	const char *		 s;
+
+	mp_obj_module_t *hershey = (mp_obj_module_t*)args[0];
+
+	if (mp_obj_is_int(args[1])) {
+		mp_int_t c		 = mp_obj_get_int(args[1]);
+		single_char_s[0] = c & 0xff;
+		s				 = single_char_s;
+	} else {
+		s = mp_obj_str_get_str(args[1]);
+	}
+
+	mp_int_t x = mp_obj_get_int(args[2]);
+	mp_int_t y = mp_obj_get_int(args[3]);
+
+	//mp_int_t color = (n_args > 5) ? mp_obj_get_int(args[5]) : WHITE;
+
+	mp_int_t scale = 256;
+	if (n_args > 4) {
+		if (mp_obj_is_float(args[4])) {
+			scale = (mp_int_t)(256.0*mp_obj_float_get(args[4]));
+		}
+		if (mp_obj_is_int(args[4])) {
+			scale = 256*mp_obj_get_int(args[4]);
+		}
+	}
+	
+	
+
+	mp_obj_dict_t *	 dict			 = (mp_obj_dict_t*)(hershey->globals);
+	mp_obj_t *		 index_data_buff = (mp_obj_t *)mp_obj_dict_get(dict, MP_OBJ_NEW_QSTR(MP_QSTR_INDEX));
+	mp_buffer_info_t index_bufinfo;
+	mp_get_buffer_raise(index_data_buff, &index_bufinfo, MP_BUFFER_READ);
+	uint8_t *index = (uint8_t*)index_bufinfo.buf;
+	
+
+	mp_obj_t *		 font_data_buff = (mp_obj_t*)mp_obj_dict_get(dict, MP_OBJ_NEW_QSTR(MP_QSTR_FONT));
+	mp_buffer_info_t font_bufinfo;
+	mp_get_buffer_raise(font_data_buff, &font_bufinfo, MP_BUFFER_READ);
+	int8_t *font = (int8_t*)font_bufinfo.buf;
+
+	int16_t from_x = x;
+	int16_t from_y = y;
+	int16_t to_x   = x;
+	int16_t to_y   = y;
+	int16_t pos_x  = x;
+	int16_t pos_y  = y;
+	bool	penup  = true;
+	char	c;
+	int16_t ii;
+
+	while ((c = *s++)) {
+		if (c >= 32 && c <= 127) {
+			ii = (c - 32) * 2;
+
+			int16_t offset = index[ii] | (index[ii + 1] << 8);
+			int16_t length = font[offset++];
+			int16_t left   = (int) ((scale * (font[offset++] - 0x52) + 128)>>8);
+			int16_t right  = (int) ((scale * (font[offset++] - 0x52) + 128)>>8);
+			int16_t width  = right - left;
+
+			if (length) {
+				int16_t i;
+				for (i = 0; i < length; i++) {
+					if (font[offset] == ' ') {
+						offset += 2;
+						penup = true;
+						continue;
+					}
+
+					int16_t vector_x = (int) ((scale * (font[offset++] - 0x52) + 128)>>8);
+					int16_t vector_y = (int) ((scale * (font[offset++] - 0x52) + 128)>>8);
+
+					if (!i || penup) {
+						from_x = pos_x + vector_x - left;
+						from_y = pos_y + vector_y;
+					} else {
+						to_x = pos_x + vector_x - left;
+						to_y = pos_y + vector_y;
+
+						Point p1(from_x, from_y);
+                        Point p2(to_x, to_y);
+                        display->line(p1, p2);
+						//line(self, from_x, from_y, to_x, to_y, color);
+						from_x = to_x;
+						from_y = to_y;
+					}
+					penup = false;
+				}
+			}
+			pos_x += width;
+		}
+	}
+
+	return mp_const_none;
+}
+//STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(st7789_ST7789_draw_obj, 5, 7, st7789_ST7789_draw);
 }

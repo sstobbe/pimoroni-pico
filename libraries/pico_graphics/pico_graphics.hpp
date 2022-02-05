@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <vector>
-#include "font6_data.hpp"
+#include "font8_data.hpp"
 
 // a tiny little graphics library for our Pico products
 // supports only 16-bit (565) RGB framebuffers

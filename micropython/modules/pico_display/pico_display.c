@@ -37,6 +37,8 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_3(picodisplay_circle_obj, picodisplay_circle);
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(picodisplay_character_obj, 3, 4, picodisplay_character);
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(picodisplay_text_obj, 4, 5, picodisplay_text);
 
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(picodisplay_line_obj, 4, 4, picodisplay_line);
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(picodisplay_draw_obj, 4, 5, picodisplay_draw);
 
 /***** Globals Table *****/
 STATIC const mp_map_elem_t picodisplay_globals_table[] = {
@@ -61,6 +63,8 @@ STATIC const mp_map_elem_t picodisplay_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_circle), MP_ROM_PTR(&picodisplay_circle_obj) },
     { MP_ROM_QSTR(MP_QSTR_character), MP_ROM_PTR(&picodisplay_character_obj) },
     { MP_ROM_QSTR(MP_QSTR_text), MP_ROM_PTR(&picodisplay_text_obj) },
+    { MP_ROM_QSTR(MP_QSTR_line), MP_ROM_PTR(&picodisplay_line_obj) },
+    { MP_ROM_QSTR(MP_QSTR_draw), MP_ROM_PTR(&picodisplay_draw_obj) },
     { MP_ROM_QSTR(MP_QSTR_BUTTON_A), MP_ROM_INT(BUTTON_A) },
     { MP_ROM_QSTR(MP_QSTR_BUTTON_B), MP_ROM_INT(BUTTON_B) },
     { MP_ROM_QSTR(MP_QSTR_BUTTON_X), MP_ROM_INT(BUTTON_X) },
